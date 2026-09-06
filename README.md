@@ -1,7 +1,7 @@
-# Project title
+# My home practice
 
-## Goal
-Short project objective.
+## Understand Tutorial2
+I want to practice the exercises from tutorial 2 to understand them better
 
 ## Data
 - Main file: video_view.csv
@@ -18,4 +18,4 @@ Short project objective.
 ## Expected output
 - report.html
 
-- Doing some testing here! 
+- Trying to find my way around all this
