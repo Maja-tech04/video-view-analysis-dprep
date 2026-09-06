@@ -1,0 +1,158 @@
+---
+title: "My first Quarto Page"
+format: html
+---
+# Exercise 1
+I will explore this data set and prepare the environment
+Practice makes perfect
+
+```{r}
+library(tidyverse) 
+```
+
+```{r}
+getwd()
+list.files()
+```
+
+```{r}
+
+library(tidyverse)
+if (!file.exists("video_view.csv")) {
+data_url <- paste0(
+"https://raw.githubusercontent.com/hannesdatta/",
+"course-dprep/refs/heads/main/material/tutorials/r-bootcamp-rev/",
+"video_view.csv"
+)
+download.file(data_url, "video_view.csv")
+}
+videos <- read_csv("video_view.csv")
+```
+
+```{r}
+head(videos)
+names(videos)
+glimpse(videos)
+summary(videos$watch_rate)
+```
+
+# Example 1
+What each line does:
+• videos %>% starts from the full table
+• select(...) keeps only 5 relevant variables
+• filter(...) keeps rows passing both rules
+```{r}
+high_quality <- videos %>%
+select(video_id, creator_id, impressions_n, watched_n, watch_rate) %>%
+filter(watch_rate >= 0.7, impressions_n >= 20)
+```
+
+```{r}
+nrow(high_quality)
+```
+
+```{r}
+nrow(videos)
+```
+# Example 2
+What each line does:
+• mutate(...) adds a new column without deleting old ones
+• rename(...) makes names shorter and easier to read
+• arrange(desc(...)) puts largest values at the top
+```{r}
+video_scores <- videos %>%
+mutate(
+watched_share = watched_n / impressions_n
+) %>%
+rename(
+impressions = impressions_n,
+watched = watched_n
+) %>%
+arrange(desc(watched_share))
+```
+
+# Example 3
+Question:
+• What are overall totals/averages in the full dataset?
+What this returns:
+• exactly one row with full-sample metrics
+```{r}
+videos %>%
+summarise(
+total_impressions = sum(impressions_n, na.rm = TRUE),
+avg_watch_rate = mean(watch_rate, na.rm = TRUE),
+n_videos = n()
+)
+```
+
+# Example 4
+Question:
+• How do creator-level metrics differ across creators?
+What this returns:
+• one row per creator_id
+```{r}
+creator_summary <- videos %>%
+group_by(creator_id) %>%
+summarise(
+videos_n = n(),
+impressions_total = sum(impressions_n, na.rm = TRUE),
+watch_rate_avg = mean(watch_rate, na.rm = TRUE)
+) %>%
+arrange(desc(impressions_total))
+```
+
+```{r}
+n_distinct(videos$creator_id) 
+```
+
+```{r}
+nrow(creator_summary)
+```
+
+# Exercise 2
+Create creator_summary from videos with:
+1. group_by(creator_id)
+2. summarise(videos_n, impressions_total, watch_rate_avg)
+3. sorted by impressions_total descending
+Then answer in one sentence:
+• Which creator has the most impressions?
+```{r}
+creator_summary <- videos %>%
+group_by(creator_id) %>%
+summarise(
+videos_n = n(),
+impressions_total = sum(impressions_n, na.rm = TRUE) ,
+watch_rate_avg = mean(watch_rate, na.rm = TRUE)
+) %>%
+arrange(desc(impressions_total))
+```
+
+Question answered: creator 27 has the most impressions (1344)
+# Exercise 3
+Create object top_watch, that contains the following information: the video id, creator id, watch
+rate, and at least 50 impressions per video. Arrange your answer by having watch rate descending.
+
+```{r}
+top_watch <- videos %>%
+select(video_id, creator_id, watch_rate, impressions_n) %>%
+filter(impressions_n >= 50) %>%
+arrange(desc(watch_rate))
+```
+
+# Exercise 4
+Add a new variable and summarize it:
+1. create engagement = watched_n / impressions_n using mutate()
+2. aggregate by creator_id using group_by() + summarise()
+3. compute mean engagement per creator
+4. sort descending
+Expected output: one row per creator with mean engagement.
+
+```{r}
+creator_engagement <- videos %>%
+mutate(engagement = watched_n / impressions_n) %>%
+group_by(creator_id) %>%
+summarise(mean_engagement = mean(engagement, na.rm = TRUE)) %>%
+arrange(desc(mean_engagement))
+
+creator_engagement
+```
