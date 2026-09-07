@@ -19,3 +19,5 @@ I want to practice the exercises from tutorial 2 to understand them better
 - report.html
 
 - Trying to find my way around all this
+
+# Learning how to make gplot
